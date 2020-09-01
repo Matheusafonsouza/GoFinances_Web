@@ -19,7 +19,7 @@ interface Transaction {
   formattedValue: string;
   formattedDate: string;
   type: 'income' | 'outcome';
-  category_id: { title: string };
+  category: { title: string };
   created_at: Date;
 }
 
@@ -36,6 +36,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
       const response = await api.get('transactions');
+
+      console.log(response);
 
       const formattedTransaction = response.data.transactions.map(
         (transaction: Transaction) => ({
@@ -70,30 +72,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">
-              R$
-              {balance.income}
-            </h1>
+            <h1 data-testid="balance-income">{balance.income}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">
-              R$
-              {balance.outcome}
-            </h1>
+            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">
-              R$
-              {balance.total}
-            </h1>
+            <h1 data-testid="balance-total">{balance.total}</h1>
           </Card>
         </CardContainer>
 
@@ -111,12 +104,13 @@ const Dashboard: React.FC = () => {
             <tbody>
               {transactions.map(transaction => (
                 <tr key={transaction.id}>
-                  <td className="title">{transaction.title}</td>
-                  <td className="income">
-                    R$
-                    {transaction.value}
+                  <td className={transaction.title}>{transaction.title}</td>
+                  <td className={transaction.type}>
+                    {transaction.type === 'income'
+                      ? transaction.formattedValue
+                      : `- ${transaction.formattedValue}`}
                   </td>
-                  <td>{transaction.category_id.title}</td>
+                  <td>{transaction.category.title}</td>
                   <td>{transaction.formattedDate}</td>
                 </tr>
               ))}
